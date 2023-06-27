@@ -1,0 +1,87 @@
+{
+  "data_retrieval_method": "RetrieveFromCSV",
+  "data_retrieval_init_args": {
+    "file_name": "./data/CONDA_full_separated.csv"
+  },
+  "data_transformations": [
+    ["MergeLinesWithMultipleToxicSpans", {}],
+    ["ConvertFullTextToWordToken", {}],
+    ["BuildContext", {}]
+  ],
+  "data_output_method": "SplitDataset",
+  "data_output_init_args": {
+    "train_percentage": 0.8,
+    "test_percentage": 0.2,
+    "random_state": 43,
+    "shuffle": true,
+    "ratio_tolerance": 0.05
+  },
+
+  "per_gpu_train_batch_size": 8,
+  "train_dataloader_num_workers": 0,
+  "val_dataloader_num_workers": 0,
+  "val_batch_size": 32,
+  "collate_method_name": "SentenceCollate",
+  "collate_method_init_args": {
+    "tokenizer": "bert-base-uncased",
+    "max_token_length": 512,
+    "truncation_strategy": "only_first",
+    "truncation_side": "left"
+  },
+
+  "model_classification_type": "ToxicSentenceClassification",
+  "model_class": "ToxicSentenceClassification",
+  "model_class_init_args": {
+    "model_name": "bert-base-uncased"
+  },
+
+  "learning_rate": 1e-5,
+  "weight_decay": 0.0,
+  "adam_epsilon": 1e-8,
+
+  "num_warmup_steps": 200,
+  "num_hard_restart_cycles": -1,
+
+  "gradient_accumulation_steps": 1,
+  "max_grad_norm": 1.0,
+
+  "continue_training": false,
+  "continue_training_model_file_path": "",
+
+  "max_epochs_to_train": 100,
+  "random_seed": 93,
+
+  "val": true,
+  "val_per_x_epochs": 1,
+  "val_metric_methods": [
+    [
+      "SentenceLevelMetric",
+      {
+        "token_to_sentence_strategies": ["FirstToxicToken"],
+        "token_to_sentence_strategies_init": [{}]
+      }
+    ],
+    [
+      "TokenLevelMetric",
+      {
+        "tagging_system": "None"
+      }
+    ]
+  ],
+
+  "save_model": true,
+  "save_per_x_epoch": 1,
+  "num_models_to_save": 1,
+  "model_save_prepend_name": "CONDA",
+  "save_folder_path": "checkpoints\\CONDA",
+  "save_best_model_metric": "FirstToxicToken_weighted avg_f1-score",
+  "best_model_save_name": "CONDA",
+
+  "early_stopping_strategy": "BestValMetric",
+  "metric_to_compare": "FirstToxicToken_weighted avg_f1-score",
+  "min_epochs_to_train": 3,
+  "patience": 2,
+
+  "tb_log_dir": null,
+  "log_per_x_epochs": 5
+}
